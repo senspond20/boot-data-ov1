@@ -2,5 +2,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.demo.mapper.CategoryMapper" >
  
-
+    <select id="select_Category" resultType="hashmap" parameterType="long">
+        with recursive cte (id, category_name, parrent_id) as
+            (
+            select      id,
+                    category_name,
+                    parrent_id
+            from       category
+            where      parrent_id = 0
+            union all
+            select     r.id,
+                    r.category_name ,
+                    r.parrent_id
+            from       category r
+            inner join cte
+                    on r.parrent_id = cte.id
+            ) 
+        select * from cte;
+    </select>
+    
+    <select id ="select_Category2" resultType="hashmap" parameterType="long">
+        SELECT CASE WHEN LEVEL-1 > 0 then CONCAT(CONCAT(REPEAT('    ', level  - 1),'┗'), c.category_name)
+                        ELSE c.category_name
+                END AS name
+            , c.id
+            , c.parrent_id
+            , fnc.level
+        FROM
+            (SELECT fnc_hierarchi() AS id, @level AS level
+                FROM (SELECT @start_with:=0, @id:=@start_with, @level:=0) vars
+                JOIN category
+                WHERE @id IS NOT NULL) fnc
+        LEFT OUTER JOIN category c ON fnc.id = c.id
+    </select>
 </mapper>
