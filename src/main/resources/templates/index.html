@@ -17,11 +17,11 @@
         .level3::before{
             content: "----";
         }
-        #response2 li{
+        .response2 li{
             cursor: pointer;
         }
 
-        #response2 li span:hover{
+        .response2 li span:hover{
             color : red;
         }
         #response3 ul{
@@ -34,12 +34,41 @@
         ul,li{
             /* list-style: circle; */
         }
+        input{width: 150px;}
+        .editMenu{
+            margin-left: 50px;
+            border-radius: 4px;
+            border:1px solid #eee;
+            padding: 40px;
+        }
     </style>
 </head>
 
 <body>
     <h1>안녕하세요</h1>
     <pre th:text="${list}"></pre>
+    <div id="response"></div>
+    <hr />
+    <h3>Category</h3>
+    <div style="display: flex;">
+        <div class="response2"></div>
+        <div class ="editMenu">
+            <div>
+                <lable>id : </lable><input type ="text" name="id" readonly value="">
+            </div>
+            <div>
+                <lable>parrentId</lable><input type ="text" name="">
+            </div>
+            <div>
+                <lable>name</lable><input type ="text" name="name">
+            </div>
+            <div>
+                <lable>요약글</lable><textarea cols="51" rows="10"></textarea>
+            </div>
+        </div>
+    </div>
+    <hr/>
+    <h4>Menu Grid</h4>
     <table>
         <thead>
             <tr>
@@ -57,34 +86,33 @@
         </tbody>
     </table>
     <hr />
-    <div id="response"></div>
-    <hr />
-    <div id="response2"></div>
-    <hr />
     <div id="response3"></div>
 
     <script>
+        var newData = '';
         $(document).ready(function () {
             $.ajax({
                 url: "/category2",
                 method: "get",
                 dataType: "json"
             }).done(function (data) {
-                console.log(data)
+                // console.log(data)
                 var $html = '';
                 if (Array.isArray(data)) {
-                    data.forEach(element => {
-                        console.log(element)
-                        $html +=
-                            `<div class='node level${element.level}'>${element.name}<span>(${element.level})</span></div>`
-                    });
+                    // data.forEach(element => {
+                    //     // console.log(element)
+                    //     $html +=
+                    //         `<div class='node level${element.level}'>${element.name}<span>(${element.level})</span></div>`
+                    // });
 
-                    var newData = getTreeData(data)
-                    console.log(newData)
-                    printTree(newData,'#response2')
-                    printTree(newData,'#response3')
+                    newData = getTreeData(data)
+                    // console.log(newData)
+                    printTree(newData,'.response2')
+                    // printTree(newData,'#response3')
                 }
-                $('#response').html($html);
+                // $('#response').html($html);
+
+                init();
             }).fail(function (error) {
                 console.log(error)
             });
@@ -103,7 +131,7 @@
                 var list = item.items;
                 recAppend(list,li,lvl)
             })
-            console.log(root)
+            // console.log(root)
             // recAppend(data,root,lvl)
             $(dom).html(root);
         };
@@ -146,23 +174,49 @@
             }
             return map['-'].items;
         }
-        $('li span').on('click',function(){
-            alert('dd')
-        })
-        fetch('/category2')
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(myJson) {
-            console.log('dfdfd')
-            console.log(myJson)
-            console.log(JSON.stringify(myJson));
-        });
+      
 
-        var str = `<ul>dsdfdfsdfsf<ul>sdfssdfsdfsfd</ul>sdsfds</ul>`
+        function init(){
+            var spanBtn = document.querySelectorAll('.response2 span');
+            console.log(spanBtn);
+            for(var i=0; i < spanBtn.length; i++){
+                console.log(i)
+                spanBtn[i].addEventListener('click',function(){
+                    // alert('ddff')
+                    var key = Object.keys(newData)
 
-        var regex = new RegExp('<ul>(.*)</ul>/g');
-        regex.test(str)
+                    console.log(newData[0]);
+                    // $('.editMenu pre').text(newData)
+                });
+            }
+        }
+        // setInterval(function(){
+        //     init();
+        // },1000)
+        $(document).ready(function(){
+            // init();
+
+        })
+   
+        // function clickEvent(){
+        //     alert('클릭');
+        // }
+
+
+        // fetch('/category2')
+        // .then(function(response) {
+        //     return response.json();
+        // })
+        // .then(function(myJson) {
+        //     console.log('dfdfd')
+        //     console.log(myJson)
+        //     console.log(JSON.stringify(myJson));
+        // });
+
+        // var str = `<ul>dsdfdfsdfsf<ul>sdfssdfsdfsfd</ul>sdsfds</ul>`
+
+        // var regex = new RegExp('<ul>(.*)</ul>/g');
+        // regex.test(str)
     </script>
 </body>
 

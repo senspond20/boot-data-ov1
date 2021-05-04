@@ -115,8 +115,39 @@ function getHtml(data){
 getHtml(treeData);
 console.log(html)
 
+console.log(printTree(treeData))
 
+function printTree(data){
+    var root = '<ul>nodeRoot</ul>';
+    var lvl = 1; //first lvl
+    data.forEach(function(item){
+        var li =`<li>node${lvl}</li>`
+        li = li.replace(`node${lvl}`,`${item.name}(${lvl})`);
+        root = root.replace(`nodeRoot`, li);
+        var list = item.items;
+        // recAppend(list,li,lvl)
+    })
+    // console.log(root)
+    // recAppend(data,root,lvl)
+    return root;
+};
 
+function recAppend(list, ele, lvl){
+    if(list.length !=0){
+        lvl++;
+        var ul = document.createElement('ul');
+        list.forEach(function(item){
+            var li = document.createElement('li')
+            var span = document.createElement('span');
+            span.append(`${item.name}(${lvl})`);
+            li.appendChild(span)
+            ul.appendChild(li)
+            var list = item.items;
+            return recAppend(list, li,lvl);
+        })
+        ele.appendChild(ul);
+    }
+};
 
 
 

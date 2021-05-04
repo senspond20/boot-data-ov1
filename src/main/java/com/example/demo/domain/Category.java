@@ -19,7 +19,7 @@ public class Category {
 
     public Category(){
     }
-
+    
     @Builder
     public Category(Long id, Long parrentId, String categoryName){
         this.id = id;
