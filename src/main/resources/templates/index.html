@@ -149,7 +149,20 @@
         $('li span').on('click',function(){
             alert('dd')
         })
+        fetch('/category2')
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(myJson) {
+            console.log('dfdfd')
+            console.log(myJson)
+            console.log(JSON.stringify(myJson));
+        });
 
+        var str = `<ul>dsdfdfsdfsf<ul>sdfssdfsdfsfd</ul>sdsfds</ul>`
+
+        var regex = new RegExp('<ul>(.*)</ul>/g');
+        regex.test(str)
     </script>
 </body>
 
