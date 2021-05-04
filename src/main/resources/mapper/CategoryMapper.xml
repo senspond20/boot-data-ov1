@@ -22,6 +22,19 @@
     </select>
     
     <select id ="select_Category2" resultType="hashmap" parameterType="long">
+        SELECT c.category_name AS name
+            , c.id
+            , c.parrent_id
+            , fnc.level
+        FROM
+            (SELECT fnc_hierarchi() AS id, @level AS level
+                FROM (SELECT @start_with:=0, @id:=@start_with, @level:=0) vars
+                JOIN category
+                WHERE @id IS NOT NULL) fnc
+        LEFT OUTER JOIN category c ON fnc.id = c.id
+    </select>
+
+    <select id ="select_Category3" resultType="hashmap" parameterType="long">
         SELECT CASE WHEN LEVEL-1 > 0 then CONCAT(CONCAT(REPEAT('    ', level  - 1),'┗'), c.category_name)
                         ELSE c.category_name
                 END AS name

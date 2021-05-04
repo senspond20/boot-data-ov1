@@ -7,6 +7,8 @@ public class Test {
     public static void main(String...arg) {
         HierarchyNode node = new HierarchyNode(1);
         HierarchyNode node2Of1 = node.appendToChild(2);
+
+        
         node.appendToChild(3);
         node.appendToChild(4);
         node2Of1.appendToChild(5);

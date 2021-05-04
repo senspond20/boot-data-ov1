@@ -1,54 +1,156 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <title>Document</title>
-</head>
-<body>
-     <h1>안녕하세요</h1>
-     <pre th:text="${list}"></pre>
-<table>
-    <thead>
-         <tr>
-             <th>Id</th>
-             <th>categoryName</th>
-             <th>parrentId</th>
-         </tr>
-    </thead>
-    <tbody>
-        <tr th:each="items : ${list}">
-            <td th:text="${items.id}"></td>
-            <td th:text="${items.category_name}"></td>
-            <td th:text="${items.parrent_id}"></td>
-        </tr>
-    </tbody>
-</table>
-<hr />
-<div id ="response"></div>
+    <style>
+        .level1::before{
+            content: "+";
+        }
+        .level2::before{
+            content: "--";
+        }
+        .level3::before{
+            content: "----";
+        }
+        #response2 li{
+            cursor: pointer;
+        }
 
-<script>
-    $(document).ready(function(){
-        $.ajax({
-            url : "/category2",
-            method :"get",
-            dataType : "json"
-        }).done(function(data){
-            console.log(data)
-            var $html = '';
-            if(Array.isArray(data)){
-                data.forEach(element => {
-                    console.log(element)
-                    $html += `<div><pre>${element.name}<span>(${element.level})</span></pre></div>`
-                });
-            }
-            $('#response').html($html);
-        }).fail(function(error){
-            console.log(error)
+        #response2 li span:hover{
+            color : red;
+        }
+        #response3 ul{
+            
+            display: flex;
+        }
+        #response3 ul li{
+            border: 0 1px solid black;
+        }
+        ul,li{
+            /* list-style: circle; */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>안녕하세요</h1>
+    <pre th:text="${list}"></pre>
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>categoryName</th>
+                <th>parrentId</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="items : ${list}">
+                <td th:text="${items.id}"></td>
+                <td th:text="${items.category_name}"></td>
+                <td th:text="${items.parrent_id}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <hr />
+    <div id="response"></div>
+    <hr />
+    <div id="response2"></div>
+    <hr />
+    <div id="response3"></div>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "/category2",
+                method: "get",
+                dataType: "json"
+            }).done(function (data) {
+                console.log(data)
+                var $html = '';
+                if (Array.isArray(data)) {
+                    data.forEach(element => {
+                        console.log(element)
+                        $html +=
+                            `<div class='node level${element.level}'>${element.name}<span>(${element.level})</span></div>`
+                    });
+
+                    var newData = getTreeData(data)
+                    console.log(newData)
+                    printTree(newData,'#response2')
+                    printTree(newData,'#response3')
+                }
+                $('#response').html($html);
+            }).fail(function (error) {
+                console.log(error)
+            });
         });
-    });
-</script>
+
+        function printTree(data, dom){
+            var root = document.createElement('ul');
+            var lvl = 1; //first lvl
+            data.forEach(function(item){
+                var li = document.createElement('li')
+                var span = document.createElement('span');
+
+                span.append(`${item.name}(${lvl})`);
+                li.appendChild(span)
+                root.appendChild(li)
+                var list = item.items;
+                recAppend(list,li,lvl)
+            })
+            console.log(root)
+            // recAppend(data,root,lvl)
+            $(dom).html(root);
+        };
+
+        function recAppend(list, ele, lvl){
+            if(list.length !=0){
+                lvl++;
+                var ul = document.createElement('ul');
+                list.forEach(function(item){
+                    var li = document.createElement('li')
+                    var span = document.createElement('span');
+                    span.append(`${item.name}(${lvl})`);
+                    li.appendChild(span)
+                    ul.appendChild(li)
+                    var list = item.items;
+                    return recAppend(list, li,lvl);
+                })
+                ele.appendChild(ul);
+            }
+        };
+
+        function getTreeData(array) {
+            var map = {};
+            for (var i = 0; i < array.length; i++) {
+                var obj = {
+                    "id": array[i]['id'],
+                    "name": array[i]['name'],
+                    "level": array[i]['level']
+                };
+                obj.items = [];
+                map[obj.id] = obj;
+                var parent = array[i]['parrent_id'] || '-';
+
+                if (!map[parent]) {
+                    map[parent] = {
+                        items: []
+                    };
+                }
+                map[parent].items.push(obj);
+            }
+            return map['-'].items;
+        }
+        $('li span').on('click',function(){
+            alert('dd')
+        })
+
+    </script>
 </body>
+
 </html>
